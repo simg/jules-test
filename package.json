@@ -1,0 +1,24 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Test App for Jules AI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simg/jules-test.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simg/jules-test/issues"
+  },
+  "homepage": "https://github.com/simg/jules-test#readme",
+  "devDependencies": {
+    "phaser": "^3.88.2",
+    "typescript": "^5.8.3"
+  }
+}
