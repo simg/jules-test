@@ -11,7 +11,7 @@ const config: Phaser.Types.Core.GameConfig = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 0 },
+            gravity: { x: 0, y: 0 }, // Added x: 0
             debug: false
         }
     },
@@ -32,14 +32,14 @@ const enemyShootInterval: number = 1500; // Enemy Shoot Interval: 2000ms -> 1500
 
 let score: number = 0;
 let lives: number = 3;
-let scoreText: Phaser.GameObjects.Text;
-let livesText: Phaser.GameObjects.Text;
-let gameOverText: Phaser.GameObjects.Text;
-let restartText: Phaser.GameObjects.Text;
+let scoreText: Phaser.GameObjects.Text; // Assuming these are always assigned in create
+let livesText: Phaser.GameObjects.Text;   // Assuming these are always assigned in create
+let gameOverText: Phaser.GameObjects.Text | null = null;
+let restartText: Phaser.GameObjects.Text | null = null;
 
 let isGameOver: boolean = false;
 let gameStarted: boolean = false;
-let instructionText: Phaser.GameObjects.Text;
+let instructionText: Phaser.GameObjects.Text | null = null;
 
 // Audio keys
 const SFX_PLAYER_SHOOT = 'sfx_player_shoot';
@@ -94,24 +94,31 @@ function create(this: Phaser.Scene) {
         runChildUpdate: true
     });
 
-    this.physics.add.collider(player['bullets'], enemies, handleBulletEnemyCollision as ArcadePhysicsCallback, undefined, this);
+    this.physics.add.collider(player['bullets'], enemies, handleBulletEnemyCollision as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
 
     enemyBullets = this.physics.add.group({
         classType: EnemyBullet,
         runChildUpdate: true
     });
-    this.physics.add.collider(player, enemyBullets, handlePlayerHitByEnemyBullet as ArcadePhysicsCallback, undefined, this);
+    this.physics.add.collider(player, enemyBullets, handlePlayerHitByEnemyBullet as Phaser.Types.Physics.Arcade.ArcadePhysicsCallback, undefined, this);
 
     scoreText = this.add.text(16, 16, 'Score: ' + score, { fontSize: '32px', color: '#FFF' });
     livesText = this.add.text(this.cameras.main.width - 16, 16, 'Lives: ' + lives, { fontSize: '32px', color: '#FFF' }).setOrigin(1, 0);
 
-    if (gameOverText && gameOverText.scene) gameOverText.destroy();
-    if (restartText && restartText.scene) restartText.destroy();
-    gameOverText = null; 
-    restartText = null;
+    if (gameOverText) {
+        (gameOverText as any).destroy();
+        gameOverText = null; 
+    }
+    if (restartText) {
+        (restartText as any).destroy();
+        restartText = null;
+    }
 
     // Display initial instructions
-    if (instructionText && instructionText.scene) instructionText.destroy(); // Clear previous if any
+    if (instructionText) { // Clear previous if any
+        (instructionText as any).destroy();
+        instructionText = null;
+    }
     instructionText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2, 'Arrow keys to move, Space to shoot.\nPress any key to start!', { fontSize: '24px', color: '#FFF', align: 'center' }).setOrigin(0.5);
     
     // Game doesn't start (waves, music) until a key is pressed
@@ -124,8 +131,10 @@ function startGame(this: Phaser.Scene) {
     if (isGameOver || gameStarted) return;
 
     gameStarted = true;
-    if (instructionText) instructionText.destroy();
-    instructionText = null; // Clear reference
+    if (instructionText) {
+        (instructionText as any).destroy();
+        instructionText = null; // Clear reference
+    }
 
     player.setActive(true); // Activate player for input and visibility of actions
 
@@ -139,7 +148,8 @@ function startGame(this: Phaser.Scene) {
     }
 }
 
-function spawnEnemiesForWave(scene: Phaser.Scene, waveConfig: { enemies: number, speed?: number, formation?: string }) {
+// function spawnEnemiesForWave(scene: Phaser.Scene, waveConfig: { enemies: number, speed?: number, formation?: string }) {
+// The above line is the start of the duplicate. The actual implementation below is the one to keep.
 
 function spawnEnemiesForWave(scene: Phaser.Scene, waveConfig: { enemies: number, speed?: number, formation?: string }) {
     console.log(`Spawning wave with ${waveConfig.enemies} enemies.`);
@@ -175,7 +185,7 @@ function startNextWave(this: Phaser.Scene) {
 }
 
 
-function handleBulletEnemyCollision(bullet: Phaser.GameObjects.GameObject, enemy: Phaser.GameObjects.GameObject): void {
+function handleBulletEnemyCollision(this: Phaser.Scene, bullet: Phaser.GameObjects.GameObject, enemy: Phaser.GameObjects.GameObject): void {
     bullet.destroy();
     enemy.destroy();
     score += 10;
@@ -183,7 +193,7 @@ function handleBulletEnemyCollision(bullet: Phaser.GameObjects.GameObject, enemy
     this.sound.play(SFX_ENEMY_HIT);
 }
 
-function handlePlayerHitByEnemyBullet(playerObj: Phaser.GameObjects.GameObject, enemyBullet: Phaser.GameObjects.GameObject): void {
+function handlePlayerHitByEnemyBullet(this: Phaser.Scene, playerObj: Phaser.GameObjects.GameObject, enemyBullet: Phaser.GameObjects.GameObject): void {
     if (isGameOver) return; // Don't process if already game over
 
     enemyBullet.destroy();

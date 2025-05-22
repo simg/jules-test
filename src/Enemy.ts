@@ -1,8 +1,7 @@
 import 'phaser';
 
 import { EnemyBullet } from './EnemyBullet'; // Import EnemyBullet
-
-import { EnemyBullet } from './EnemyBullet'; // Import EnemyBullet
+// Removed duplicate import of EnemyBullet
 
 export class Enemy extends Phaser.Physics.Arcade.Sprite {
     private moveSpeed: number = 100;

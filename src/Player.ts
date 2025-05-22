@@ -28,8 +28,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         this.setVelocityX(this.moveSpeed);
     }
 
-    public stop(): void {
+    public stop(): this {
         this.setVelocityX(0);
+        return this;
     }
 
     public shoot(): void {
