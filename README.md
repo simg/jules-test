@@ -23,6 +23,25 @@ To build and run this game, you will need:
     ```
     This command will download and install Phaser, TypeScript, and any other necessary development tools defined in `package.json`. You may also need to install `esbuild` if you intend to use it for bundling (see "Bundling for the Browser" section).
 
+## Audio Assets
+
+**Important Note:** The audio files currently included in the `assets/sounds/` and `assets/music/` directories are **placeholders only**. They do not contain actual audio data.
+
+-   **Placeholder Files:**
+    -   `assets/sounds/player_shoot.wav`
+    -   `assets/sounds/enemy_hit.wav`
+    -   `assets/sounds/player_hit.wav`
+    -   `assets/music/background.mp3`
+
+-   **Required Action:**
+    For sound effects and music to work correctly in the game, you **must replace these placeholder files** with valid audio files (e.g., actual `.wav` or `.mp3` files). Ensure the replacement files use the same names and are placed in the same directories.
+
+-   **Behavior with Placeholders:**
+    If the placeholder files are used as-is (i.e., they are empty or invalid audio format):
+    -   The game will **not** crash. Recent code changes include checks to prevent errors if audio files are missing or invalid.
+    -   However, you will likely see "Error decoding audio data" messages (or similar) in your browser's developer console.
+    -   No sound effects or music will be heard.
+
 ## Building the Game
 
 The game is written in TypeScript (`.ts` files located in the `src` directory) and needs to be compiled into JavaScript (`.js` files).

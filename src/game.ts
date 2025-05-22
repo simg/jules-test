@@ -141,10 +141,14 @@ function startGame(this: Phaser.Scene) {
     startNextWave.call(this); // Start the first wave
 
     // Start background music
-    if (!this.sound.get(MUSIC_BACKGROUND) || !this.sound.get(MUSIC_BACKGROUND).isPlaying) {
-        this.sound.play(MUSIC_BACKGROUND, { loop: true, volume: 0.5 });
-    } else if (this.sound.get(MUSIC_BACKGROUND).isPaused) { 
-        this.sound.get(MUSIC_BACKGROUND).resume();
+    if (this.sound.exists(MUSIC_BACKGROUND)) {
+        if (!this.sound.get(MUSIC_BACKGROUND) || !this.sound.get(MUSIC_BACKGROUND).isPlaying) {
+            this.sound.play(MUSIC_BACKGROUND, { loop: true, volume: 0.5 });
+        } else if (this.sound.get(MUSIC_BACKGROUND).isPaused) { 
+            this.sound.get(MUSIC_BACKGROUND).resume();
+        }
+    } else {
+        console.warn(`Audio key ${MUSIC_BACKGROUND} not found, cannot play background music.`);
     }
 }
 
@@ -190,7 +194,9 @@ function handleBulletEnemyCollision(this: Phaser.Scene, bullet: Phaser.GameObjec
     enemy.destroy();
     score += 10;
     scoreText.setText('Score: ' + score);
-    this.sound.play(SFX_ENEMY_HIT);
+    if (this.sound.exists(SFX_ENEMY_HIT)) {
+        this.sound.play(SFX_ENEMY_HIT);
+    }
 }
 
 function handlePlayerHitByEnemyBullet(this: Phaser.Scene, playerObj: Phaser.GameObjects.GameObject, enemyBullet: Phaser.GameObjects.GameObject): void {
@@ -199,14 +205,18 @@ function handlePlayerHitByEnemyBullet(this: Phaser.Scene, playerObj: Phaser.Game
     enemyBullet.destroy();
     lives--;
     livesText.setText('Lives: ' + lives);
-    this.sound.play(SFX_PLAYER_HIT);
+    if (this.sound.exists(SFX_PLAYER_HIT)) {
+        this.sound.play(SFX_PLAYER_HIT);
+    }
     console.log('Player hit! Lives left: ' + lives);
 
     if (lives <= 0) {
         isGameOver = true;
         console.log('Game Over');
         (playerObj as Player).setActive(false).setVisible(false);
-        this.sound.stopByKey(MUSIC_BACKGROUND); // Stop music on game over
+        if (this.sound.exists(MUSIC_BACKGROUND)) { // Guard stopping music as well
+            this.sound.stopByKey(MUSIC_BACKGROUND); 
+        }
 
         // Display Game Over messages
         gameOverText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 - 50, 'Game Over', { fontSize: '64px', color: '#FF0000' }).setOrigin(0.5);
