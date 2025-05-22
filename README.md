@@ -21,55 +21,97 @@ To build and run this game, you will need:
     ```bash
     npm install
     ```
-    This command will download and install Phaser, TypeScript, and any other necessary development tools defined in `package.json`.
+    This command will download and install Phaser, TypeScript, and any other necessary development tools defined in `package.json`. You may also need to install `esbuild` if you intend to use it for bundling (see "Bundling for the Browser" section).
 
 ## Building the Game
 
-The game is written in TypeScript (`.ts` files located in the `src` directory) and needs to be compiled into JavaScript (`.js` files) to run in a browser.
+The game is written in TypeScript (`.ts` files located in the `src` directory) and needs to be compiled into JavaScript (`.js` files).
 
 1.  **Compile TypeScript:**
     Run the following command in your terminal from the project root:
     ```bash
     npx tsc
     ```
-    This command uses the TypeScript compiler (invoked via `npx` which runs the version specified in `node_modules`) to compile the files according to the `tsconfig.json` configuration. The compiled JavaScript output will be placed in the `dist` folder (e.g., `dist/game.js`).
+    This command uses the TypeScript compiler (invoked via `npx` which runs the version specified in `node_modules`) to compile the files according to the `tsconfig.json` configuration. The compiled JavaScript output will be placed in the `dist` folder (e.g., `dist/game.js`). This output uses CommonJS modules, which are not directly usable by browsers.
+
+## Bundling for the Browser
+
+When TypeScript is compiled with `module: "commonjs"` (as configured in `tsconfig.json`), it produces JavaScript files that use `require()` to import modules. Browsers do not natively support `require()`. A bundler is needed to resolve these modules and create a single JavaScript file that can run in the browser.
+
+We recommend `esbuild` for its speed and simplicity.
+
+### Using esbuild
+
+1.  **Installation (if not already installed as part of project setup):**
+    If you haven't installed `esbuild` yet, run:
+    ```bash
+    npm install --save-dev esbuild
+    ```
+
+2.  **Bundling Command:**
+    After compiling with `npx tsc`, run the following command to bundle the output:
+    ```bash
+    npx esbuild dist/game.js --bundle --outfile=bundle.js --format=iife
+    ```
+    -   `dist/game.js`: This is the main entry point file produced by the TypeScript compiler (`tsc`).
+    -   `--bundle`: Tells `esbuild` to inline any imported dependencies into the output file.
+    -   `--outfile=bundle.js`: Specifies the name of the output file (e.g., `bundle.js`). This is the file you will include in your `index.html`.
+    -   `--format=iife`: Outputs the code as an Immediately Invoked Function Expression. This is a good format for browser scripts as it helps avoid polluting the global scope.
 
 ## Running the Game
 
-Due to browser security restrictions (CORS policy), you cannot run the game by simply opening the `index.html` file directly from your file system. You need to serve the project files using a local HTTP server.
+To play the game, you need to compile the TypeScript, bundle the JavaScript, and then serve the project files using a local HTTP server.
 
-Here are a couple of ways to do this:
+1.  **Install all dependencies:**
+    ```bash
+    npm install 
+    ```
+    (This will install TypeScript, Phaser, and esbuild if listed in `package.json`'s devDependencies).
 
-1.  **Using `http-server` (Node.js package):**
-    -   If you don't have `http-server` installed, you can run it directly using `npx`:
-        ```bash
-        npx http-server .
-        ```
-    -   Alternatively, you can install it globally:
-        ```bash
-        npm install -g http-server
-        ```
-        And then run:
-        ```bash
-        http-server .
-        ```
-    -   By default, it will serve the current directory (`.`) on `http://localhost:8080`.
+2.  **Compile TypeScript:**
+    ```bash
+    npx tsc
+    ```
 
-2.  **Using Python's built-in HTTP server:**
-    -   If you have Python installed, you can use its simple HTTP server.
-    -   For Python 3:
-        ```bash
-        python -m http.server 8000
-        ```
-    -   For Python 2 (less common now):
-        ```bash
-        python -m SimpleHTTPServer 8000
-        ```
-    -   This will serve the current directory on `http://localhost:8000`.
+3.  **Bundle JavaScript for the browser:**
+    ```bash
+    npx esbuild dist/game.js --bundle --outfile=bundle.js --format=iife
+    ```
+    **Important:** Ensure your `index.html` file is updated to reference this bundled output file. For example, change `<script src="dist/game.js"></script>` to `<script src="bundle.js"></script>`.
 
-**Accessing the Game:**
+4.  **Serve the project locally:**
+    Due to browser security restrictions (CORS policy), you cannot run the game by simply opening the `index.html` file directly from your file system.
+    Here are a couple of ways to serve it:
 
-Once the server is running, open your web browser and navigate to the address provided by the server (e.g., `http://localhost:8080` or `http://localhost:8000`). You should see `index.html` load, and the game will start.
+    -   **Using `http-server` (Node.js package):**
+        -   If you don't have `http-server` installed, you can run it directly using `npx`:
+            ```bash
+            npx http-server .
+            ```
+        -   Alternatively, you can install it globally:
+            ```bash
+            npm install -g http-server
+            ```
+            And then run:
+            ```bash
+            http-server .
+            ```
+        -   By default, it will serve the current directory (`.`) on `http://localhost:8080`.
+
+    -   **Using Python's built-in HTTP server:**
+        -   If you have Python installed:
+        -   For Python 3:
+            ```bash
+            python -m http.server 8000
+            ```
+        -   For Python 2:
+            ```bash
+            python -m SimpleHTTPServer 8000
+            ```
+        -   This will serve the current directory on `http://localhost:8000`.
+
+5.  **Accessing the Game:**
+    Once the server is running, open your web browser and navigate to the address provided by the server (e.g., `http://localhost:8080` or `http://localhost:8000`). You should see `index.html` load, and the game will start.
 
 ---
 
