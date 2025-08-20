@@ -46,7 +46,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
                 bullet.setVisible(true);
                 // The bullet's constructor and physics should handle its movement.
                 this.lastFired = this.scene.time.now;
-                if (this.scene.sound.exists('sfx_player_shoot')) {
+                if (this.scene.sound.get('sfx_player_shoot')) {
                     this.scene.sound.play('sfx_player_shoot'); // Play shoot sound
                 }
             }

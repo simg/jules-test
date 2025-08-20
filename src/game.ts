@@ -141,7 +141,7 @@ function startGame(this: Phaser.Scene) {
     startNextWave.call(this); // Start the first wave
 
     // Start background music
-    if (this.sound.exists(MUSIC_BACKGROUND)) {
+    if (this.sound.get(MUSIC_BACKGROUND)) {
         if (!this.sound.get(MUSIC_BACKGROUND) || !this.sound.get(MUSIC_BACKGROUND).isPlaying) {
             this.sound.play(MUSIC_BACKGROUND, { loop: true, volume: 0.5 });
         } else if (this.sound.get(MUSIC_BACKGROUND).isPaused) { 
@@ -194,7 +194,7 @@ function handleBulletEnemyCollision(this: Phaser.Scene, bullet: Phaser.GameObjec
     enemy.destroy();
     score += 10;
     scoreText.setText('Score: ' + score);
-    if (this.sound.exists(SFX_ENEMY_HIT)) {
+    if (this.sound.get(SFX_ENEMY_HIT)) {
         this.sound.play(SFX_ENEMY_HIT);
     }
 }
@@ -205,7 +205,7 @@ function handlePlayerHitByEnemyBullet(this: Phaser.Scene, playerObj: Phaser.Game
     enemyBullet.destroy();
     lives--;
     livesText.setText('Lives: ' + lives);
-    if (this.sound.exists(SFX_PLAYER_HIT)) {
+    if (this.sound.get(SFX_PLAYER_HIT)) {
         this.sound.play(SFX_PLAYER_HIT);
     }
     console.log('Player hit! Lives left: ' + lives);
@@ -214,7 +214,7 @@ function handlePlayerHitByEnemyBullet(this: Phaser.Scene, playerObj: Phaser.Game
         isGameOver = true;
         console.log('Game Over');
         (playerObj as Player).setActive(false).setVisible(false);
-        if (this.sound.exists(MUSIC_BACKGROUND)) { // Guard stopping music as well
+        if (this.sound.get(MUSIC_BACKGROUND)) { // Guard stopping music as well
             this.sound.stopByKey(MUSIC_BACKGROUND); 
         }
 
